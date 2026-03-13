@@ -24,7 +24,7 @@ export default function PosterCard({ title, onAdd, onStatusChange, watchlistEntr
   const rating = watchlistEntry?.personalRating;
 
   return (
-    <div className="poster-card">
+    <div className="poster-card group">
       <Link to={`/title/${title.tmdbId}?type=${mediaType}`}>
         <img
           src={posterUrl}
