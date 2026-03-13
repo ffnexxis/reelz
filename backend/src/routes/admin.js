@@ -107,7 +107,7 @@ const staffPickSchema = z.object({
   posterPath: z.string().nullable().optional(),
   overview: z.string().nullable().optional(),
   releaseYear: z.number().int().nullable().optional(),
-  genres: z.array(z.string()).optional(),
+  genres: z.array(z.union([z.string(), z.number().transform(n => String(n))])).optional(),
   note: z.string().optional(),
 });
 
@@ -115,7 +115,7 @@ const staffPickSchema = z.object({
 router.post('/staff-picks', async (req, res) => {
   const parsed = staffPickSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.flatten() });
+    return res.status(400).json({ error: parsed.error.errors.map(e => e.message).join(', ') });
   }
 
   const { tmdbId, mediaType, title, posterPath, overview, releaseYear, genres, note } = parsed.data;
