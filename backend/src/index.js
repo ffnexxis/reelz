@@ -14,6 +14,9 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Trust Railway's reverse proxy so rate limiting and IP detection work correctly
+app.set('trust proxy', 1);
+
 // ── Security & middleware ────────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
