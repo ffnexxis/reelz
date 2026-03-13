@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-800;
+  }
+  body {
+    @apply bg-gray-950 text-gray-100;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+}
+
+@layer components {
+  .poster-card {
+    @apply relative rounded-xl overflow-hidden bg-gray-900 group cursor-pointer transition-all duration-300;
+    @apply hover:scale-105 hover:shadow-2xl hover:shadow-reelz-500/20;
+  }
+  .poster-img {
+    @apply w-full aspect-[2/3] object-cover;
+  }
+  .poster-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent;
+    @apply opacity-0 group-hover:opacity-100 transition-opacity duration-300;
+  }
+  .btn-primary {
+    @apply bg-reelz-600 hover:bg-reelz-500 text-white font-semibold px-4 py-2 rounded-lg transition-colors duration-200;
+  }
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 text-gray-100 font-medium px-4 py-2 rounded-lg transition-colors duration-200;
+  }
+  .input-dark {
+    @apply bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-4 py-2.5 w-full;
+    @apply focus:outline-none focus:border-reelz-500 focus:ring-1 focus:ring-reelz-500 transition-colors;
+    @apply placeholder:text-gray-500;
+  }
+  .badge {
+    @apply text-xs font-medium px-2 py-0.5 rounded-full;
+  }
+  .card-glass {
+    @apply bg-gray-900/60 backdrop-blur-sm border border-gray-800 rounded-xl;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-reelz-400 to-purple-400 bg-clip-text text-transparent;
+  }
+}
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms, transform 200ms;
+}

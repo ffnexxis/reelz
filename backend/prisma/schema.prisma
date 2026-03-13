@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum MediaType {
+  MOVIE
+  TV
+}
+
+enum WatchStatus {
+  WANT_TO_WATCH
+  WATCHING
+  WATCHED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+
+  watchlistEntries WatchlistEntry[]
+  customLists      CustomList[]
+  staffPicks       StaffPick[]
+
+  @@map("users")
+}
+
+model Title {
+  id          String    @id @default(cuid())
+  tmdbId      Int
+  mediaType   MediaType
+  title       String
+  posterPath  String?
+  overview    String?
+  releaseYear Int?
+  genres      String[]
+
+  watchlistEntries WatchlistEntry[]
+  customListItems  CustomListItem[]
+  staffPicks       StaffPick[]
+
+  @@unique([tmdbId, mediaType])
+  @@map("titles")
+}
+
+model WatchlistEntry {
+  id             String      @id @default(cuid())
+  userId         String
+  titleId        String
+  status         WatchStatus @default(WANT_TO_WATCH)
+  personalRating Int?        // 1-10
+  notes          String?
+  addedAt        DateTime    @default(now())
+  watchedAt      DateTime?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, titleId])
+  @@map("watchlist_entries")
+}
+
+model CustomList {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CustomListItem[]
+
+  @@map("custom_lists")
+}
+
+model CustomListItem {
+  id      String @id @default(cuid())
+  listId  String
+  titleId String
+
+  list  CustomList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  title Title      @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, titleId])
+  @@map("custom_list_items")
+}
+
+model StaffPick {
+  id             String   @id @default(cuid())
+  titleId        String
+  addedByAdminId String
+  note           String?
+  featuredAt     DateTime @default(now())
+
+  title    Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  addedBy  User  @relation(fields: [addedByAdminId], references: [id], onDelete: Cascade)
+
+  @@map("staff_picks")
+}

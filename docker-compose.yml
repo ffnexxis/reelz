@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: reelz-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-reelz}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-reelzpassword}
+      POSTGRES_DB: ${POSTGRES_DB:-reelz}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-reelz}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: reelz-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-reelz}:${POSTGRES_PASSWORD:-reelzpassword}@postgres:5432/${POSTGRES_DB:-reelz}
+      JWT_SECRET: ${JWT_SECRET:-changeme-super-secret-jwt}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-changeme-super-secret-refresh}
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+      PORT: 4000
+      NODE_ENV: development
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  user-app:
+    build:
+      context: ./user-app
+      dockerfile: Dockerfile
+    container_name: reelz-user-app
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:4000
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./user-app:/app
+      - /app/node_modules
+
+  admin-app:
+    build:
+      context: ./admin-app
+      dockerfile: Dockerfile
+    container_name: reelz-admin-app
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:4000
+    ports:
+      - '5174:5174'
+    volumes:
+      - ./admin-app:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

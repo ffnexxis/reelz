@@ -1,0 +1,90 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
+export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await login(form.email, form.password);
+      navigate('/', { replace: true });
+    } catch (err) {
+      const msg = err.message === 'Admin access required'
+        ? 'This account does not have admin access.'
+        : err.response?.data?.error || 'Login failed';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 shadow-lg mb-4">
+            <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Reelz Admin</h1>
+          <p className="text-gray-500 text-sm mt-1">Sign in with your admin account</p>
+        </div>
+
+        <div className="card p-8">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <input
+                type="email"
+                className="input"
+                placeholder="admin@example.com"
+                value={form.email}
+                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                required
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <input
+                type="password"
+                className="input"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full py-2.5 flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {loading ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          Demo: admin@reelz.dev / admin123
+        </p>
+      </div>
+    </div>
+  );
+}
