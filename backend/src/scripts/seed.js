@@ -51,10 +51,13 @@ async function main() {
     create: { userId: user.id, titleId: titles[2].id, status: 'WATCHING' },
   });
 
-  // Seed a staff pick
-  await prisma.staffPick.create({
-    data: { titleId: titles[1].id, addedByAdminId: admin.id, note: 'A timeless masterpiece. Required viewing.' },
-  }).catch(() => {});
+  // Seed a staff pick (only if none exist)
+  const pickCount = await prisma.staffPick.count();
+  if (pickCount === 0) {
+    await prisma.staffPick.create({
+      data: { titleId: titles[1].id, addedByAdminId: admin.id, note: 'A timeless masterpiece. Required viewing.' },
+    });
+  }
 
   console.log('✅ Seed complete!');
   console.log('   Admin: admin@reelz.dev / admin123');

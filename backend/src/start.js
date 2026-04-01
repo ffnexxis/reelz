@@ -10,12 +10,21 @@ try {
   process.exit(1);
 }
 
-console.log('🌱 Checking seed data…');
-try {
-  execSync('node src/scripts/seed.js', { stdio: 'inherit' });
-} catch (err) {
-  console.warn('⚠️  Seed warning:', err.message);
-}
-
-// Hand off to the main app
-require('./index.js');
+// Only seed on a fresh database
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+prisma.user.count().then(count => {
+  if (count === 0) {
+    console.log('🌱 Empty database — seeding…');
+    try {
+      execSync('node src/scripts/seed.js', { stdio: 'inherit' });
+    } catch (err) {
+      console.warn('⚠️  Seed warning:', err.message);
+    }
+  } else {
+    console.log('🌱 Database already seeded — skipping.');
+  }
+}).catch(() => {}).finally(() => {
+  prisma.$disconnect();
+  require('./index.js');
+});
