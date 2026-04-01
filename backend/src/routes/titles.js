@@ -5,6 +5,18 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
+// GET /titles/staff-picks — public endpoint for the user app home page
+router.get('/staff-picks', async (req, res) => {
+  const picks = await prisma.staffPick.findMany({
+    include: {
+      title: true,
+      addedBy: { select: { id: true, email: true } },
+    },
+    orderBy: { featuredAt: 'desc' },
+  });
+  res.json({ picks });
+});
+
 // GET /titles/search?q=&type=movie|tv|multi
 router.get('/search', async (req, res) => {
   const { q, type = 'multi' } = req.query;

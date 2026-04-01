@@ -54,6 +54,7 @@ export const titlesApi = {
   search: (q, type = 'multi') => api.get('/titles/search', { params: { q, type } }),
   getPopular: (type = 'movie') => api.get('/titles/popular', { params: { type } }),
   getDetails: (tmdbId, type = 'movie') => api.get(`/titles/${tmdbId}`, { params: { type } }),
+  getStaffPicks: () => api.get('/titles/staff-picks'),
 };
 
 // ── Watchlist ─────────────────────────────────────────────────────────────────

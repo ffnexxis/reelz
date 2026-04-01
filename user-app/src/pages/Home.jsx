@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { titlesApi, watchlistApi, adminApi } from '../api/client';
+import { titlesApi, watchlistApi } from '../api/client';
 import PosterCard from '../components/PosterCard';
 import StreamingBadge from '../components/StreamingBadge';
 
@@ -33,7 +33,7 @@ export default function Home() {
   useEffect(() => {
     Promise.all([
       titlesApi.getPopular('movie').catch(() => ({ data: { results: [] } })),
-      adminApi.getStaffPicks().catch(() => ({ data: { picks: [] } })),
+      titlesApi.getStaffPicks().catch(() => ({ data: { picks: [] } })),
       watchlistApi.get().catch(() => ({ data: { entries: [] } })),
     ]).then(([popRes, picksRes, wlRes]) => {
       setPopular(popRes.data.results || []);
@@ -215,7 +215,7 @@ export default function Home() {
         </div>
 
         {/* Staff Picks row (when not searching) */}
-        {!isSearchMode && staffPicks.length > 1 && (
+        {!isSearchMode && staffPicks.length > 0 && (
           <section className="mb-10">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-1 h-5 bg-gradient-to-b from-reelz-400 to-purple-500 rounded-full" />
