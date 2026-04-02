@@ -1,10 +1,68 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { titlesApi, watchlistApi, listsApi } from '../api/client';
 import StreamingBadge from '../components/StreamingBadge';
 
 const TMDB_POSTER = 'https://image.tmdb.org/t/p/w500';
 const TMDB_BACKDROP = 'https://image.tmdb.org/t/p/w1280';
+
+const VIDEO_TYPE_LABELS = {
+  Trailer: 'Trailer',
+  Teaser: 'Teaser',
+  Clip: 'Clip',
+  Featurette: 'Featurette',
+};
+
+function VideoPlayer({ video, onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={onClose}>
+      <div className="relative w-full max-w-4xl mx-4" onClick={e => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          className="absolute -top-10 right-0 text-white/70 hover:text-white text-sm font-medium transition-colors"
+        >
+          Close
+        </button>
+        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+          <iframe
+            className="absolute inset-0 w-full h-full rounded-xl"
+            src={`https://www.youtube.com/embed/${video.key}?autoplay=1&rel=0`}
+            title={video.name}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+        <p className="text-white/60 text-sm mt-3 text-center">{video.name}</p>
+      </div>
+    </div>
+  );
+}
+
+function VideoThumbnail({ video, onClick }) {
+  return (
+    <button
+      onClick={() => onClick(video)}
+      className="group relative rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 flex-shrink-0 w-64 aspect-video focus:outline-none focus:ring-2 focus:ring-reelz-500"
+    >
+      <img
+        src={`https://img.youtube.com/vi/${video.key}/mqdefault.jpg`}
+        alt={video.name}
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-white/90 dark:bg-white/80 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+          <svg className="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
+        <p className="text-white text-xs font-medium line-clamp-1">{video.name}</p>
+        <span className="text-white/60 text-xs">{VIDEO_TYPE_LABELS[video.type] || video.type}</span>
+      </div>
+    </button>
+  );
+}
 
 function StarRating({ value, onChange }) {
   const [hovered, setHovered] = useState(null);
@@ -48,6 +106,22 @@ export default function TitleDetail() {
   const [saving, setSaving] = useState(false);
   const [notes, setNotes] = useState('');
   const [showAddToList, setShowAddToList] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(null);
+
+  const handlePlayVideo = useCallback((video) => {
+    setActiveVideo(video);
+  }, []);
+
+  const handleCloseVideo = useCallback(() => {
+    setActiveVideo(null);
+  }, []);
+
+  useEffect(() => {
+    if (!activeVideo) return;
+    const handleEsc = (e) => { if (e.key === 'Escape') setActiveVideo(null); };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [activeVideo]);
 
   useEffect(() => {
     setLoading(true);
@@ -239,6 +313,20 @@ export default function TitleDetail() {
               </div>
             )}
 
+            {/* Videos / Trailers */}
+            {title.videos?.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-medium">
+                  Trailers & Videos
+                </p>
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin">
+                  {title.videos.map(video => (
+                    <VideoThumbnail key={video.id} video={video} onClick={handlePlayVideo} />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Watchlist actions */}
             <div className="card-glass p-5 space-y-4">
               <h3 className="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider">My Status</h3>
@@ -347,6 +435,11 @@ export default function TitleDetail() {
           </div>
         </div>
       </div>
+
+      {/* Video player modal */}
+      {activeVideo && (
+        <VideoPlayer video={activeVideo} onClose={handleCloseVideo} />
+      )}
     </div>
   );
 }

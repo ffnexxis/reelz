@@ -80,6 +80,14 @@ function normalizeTmdbDetails(details, providers, mediaType) {
     ...(usProviders?.buy || []),
   ].filter((p, i, arr) => arr.findIndex(x => x.provider_id === p.provider_id) === i);
 
+  const videos = (details.videos?.results || [])
+    .filter(v => v.site === 'YouTube' && ['Trailer', 'Teaser', 'Clip', 'Featurette'].includes(v.type))
+    .sort((a, b) => {
+      const order = { Trailer: 0, Teaser: 1, Clip: 2, Featurette: 3 };
+      return (order[a.type] ?? 9) - (order[b.type] ?? 9);
+    })
+    .map(v => ({ id: v.id, key: v.key, name: v.name, type: v.type }));
+
   return {
     tmdbId: details.id,
     mediaType: isTV ? 'TV' : 'MOVIE',
@@ -96,6 +104,7 @@ function normalizeTmdbDetails(details, providers, mediaType) {
     voteAverage: details.vote_average,
     runtime: details.runtime || (details.episode_run_time?.[0] ?? null),
     watchProviders,
+    videos,
     tagline: details.tagline,
     status: details.status,
     numberOfSeasons: details.number_of_seasons,
@@ -129,6 +138,9 @@ function getMockTitleDetails(tmdbId, mediaType) {
     watchProviders: [
       { provider_id: 8, provider_name: 'Netflix', logo_path: '/t2yyOv40HZeVlLjYsCsPHnWLk4W.jpg' },
       { provider_id: 9, provider_name: 'Amazon Prime Video', logo_path: '/emthp39XA2yngafY7QoWQ3cqAb.jpg' },
+    ],
+    videos: [
+      { id: 'mock-1', key: 'SUXWAEX2jlg', name: 'Official Trailer', type: 'Trailer' },
     ],
   };
 }
