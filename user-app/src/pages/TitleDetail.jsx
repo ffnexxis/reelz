@@ -17,10 +17,10 @@ function StarRating({ value, onChange }) {
           onMouseEnter={() => setHovered(n)}
           onMouseLeave={() => setHovered(null)}
           className={`text-xl transition-all ${
-            n <= (hovered ?? value ?? 0) ? 'text-yellow-400 scale-110' : 'text-gray-700 hover:text-gray-500'
+            n <= (hovered ?? value ?? 0) ? 'text-yellow-400 scale-110' : 'text-gray-300 dark:text-gray-700 hover:text-gray-400 dark:hover:text-gray-500'
           }`}
         >
-          ★
+          *
         </button>
       ))}
     </div>
@@ -28,9 +28,9 @@ function StarRating({ value, onChange }) {
 }
 
 const STATUSES = [
-  { value: 'WANT_TO_WATCH', label: 'Want to Watch', icon: '🔖' },
-  { value: 'WATCHING', label: 'Currently Watching', icon: '▶️' },
-  { value: 'WATCHED', label: 'Watched', icon: '✅' },
+  { value: 'WANT_TO_WATCH', label: 'Want to Watch', icon: 'Bookmark' },
+  { value: 'WATCHING', label: 'Currently Watching', icon: 'Play' },
+  { value: 'WATCHED', label: 'Watched', icon: 'Check' },
 ];
 
 export default function TitleDetail() {
@@ -86,7 +86,6 @@ export default function TitleDetail() {
       setWatchlistEntry(data.entry);
     } catch (err) {
       if (err.response?.status === 409) {
-        // Already exists — reload
         const res = await watchlistApi.get();
         const entry = res.data.entries.find(e => e.title?.tmdbId === title.tmdbId);
         setWatchlistEntry(entry || null);
@@ -158,7 +157,6 @@ export default function TitleDetail() {
   if (error || !title) {
     return (
       <div className="text-center py-32 text-gray-500">
-        <p className="text-5xl mb-4">😕</p>
         <p className="text-lg">{error || 'Title not found'}</p>
         <button onClick={() => navigate(-1)} className="btn-secondary mt-4">Go back</button>
       </div>
@@ -176,7 +174,7 @@ export default function TitleDetail() {
             className="w-full h-full object-cover"
             style={{ filter: 'blur(1px)' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/40 to-gray-950" />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-50/40 to-gray-50 dark:from-gray-950/40 dark:to-gray-950" />
         </div>
       )}
 
@@ -187,7 +185,7 @@ export default function TitleDetail() {
             <img
               src={title.posterPath ? `${TMDB_POSTER}${title.posterPath}` : 'https://placehold.co/300x450/1f2937/9ca3af?text=No+Poster'}
               alt={title.title}
-              className="w-52 rounded-xl shadow-2xl shadow-black/60 border border-gray-700/40"
+              className="w-52 rounded-xl shadow-2xl shadow-black/40 dark:shadow-black/60 border border-gray-300/40 dark:border-gray-700/40"
               onError={e => { e.target.src = 'https://placehold.co/300x450/1f2937/9ca3af?text=No+Poster'; }}
             />
           </div>
@@ -195,39 +193,39 @@ export default function TitleDetail() {
           {/* Right: Details */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start gap-3 flex-wrap mb-2">
-              <span className={`badge text-sm px-3 py-1 ${title.mediaType === 'TV' ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'}`}>
+              <span className={`badge text-sm px-3 py-1 ${title.mediaType === 'TV' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-purple-500/20 text-purple-600 dark:text-purple-400'}`}>
                 {title.mediaType === 'TV' ? 'TV Series' : 'Movie'}
               </span>
               {title.releaseYear && (
-                <span className="text-gray-400 text-sm">{title.releaseYear}</span>
+                <span className="text-gray-500 dark:text-gray-400 text-sm">{title.releaseYear}</span>
               )}
               {title.runtime && (
                 <span className="text-gray-500 text-sm">
-                  {title.mediaType === 'TV' ? `${title.numberOfSeasons}s · ${title.numberOfEpisodes}ep` : `${title.runtime}m`}
+                  {title.mediaType === 'TV' ? `${title.numberOfSeasons}s / ${title.numberOfEpisodes}ep` : `${title.runtime}m`}
                 </span>
               )}
               {title.voteAverage > 0 && (
-                <span className="badge bg-yellow-500/20 text-yellow-400 text-sm px-2.5">
-                  ★ {title.voteAverage?.toFixed(1)}
+                <span className="badge bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 text-sm px-2.5">
+                  {title.voteAverage?.toFixed(1)}
                 </span>
               )}
             </div>
 
-            <h1 className="text-4xl font-black text-white mb-1">{title.title}</h1>
+            <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-1">{title.title}</h1>
             {title.tagline && (
-              <p className="text-gray-400 italic text-sm mb-4">"{title.tagline}"</p>
+              <p className="text-gray-500 dark:text-gray-400 italic text-sm mb-4">"{title.tagline}"</p>
             )}
 
             {/* Genres */}
             {title.genres?.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-4">
                 {title.genres.map(g => (
-                  <span key={g} className="badge bg-gray-800 text-gray-300 text-xs">{g}</span>
+                  <span key={g} className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs">{g}</span>
                 ))}
               </div>
             )}
 
-            <p className="text-gray-300 leading-relaxed mb-6">{title.overview}</p>
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">{title.overview}</p>
 
             {/* Streaming providers */}
             {title.watchProviders?.length > 0 && (
@@ -243,7 +241,7 @@ export default function TitleDetail() {
 
             {/* Watchlist actions */}
             <div className="card-glass p-5 space-y-4">
-              <h3 className="font-semibold text-white text-sm uppercase tracking-wider">My Status</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider">My Status</h3>
 
               {!watchlistEntry ? (
                 <div className="flex flex-wrap gap-2">
@@ -254,7 +252,7 @@ export default function TitleDetail() {
                       disabled={adding}
                       className="btn-secondary text-sm flex items-center gap-1.5"
                     >
-                      <span>{s.icon}</span> {s.label}
+                      {s.label}
                     </button>
                   ))}
                 </div>
@@ -269,23 +267,23 @@ export default function TitleDetail() {
                         className={`text-sm px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${
                           watchlistEntry.status === s.value
                             ? 'bg-reelz-600 text-white shadow-lg shadow-reelz-500/20'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
                       >
-                        {s.icon} {s.label}
+                        {s.label}
                       </button>
                     ))}
                   </div>
 
                   {/* Rating */}
                   <div>
-                    <p className="text-xs text-gray-400 mb-2">Personal rating</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Personal rating</p>
                     <StarRating
                       value={watchlistEntry.personalRating}
                       onChange={handleRatingChange}
                     />
                     {watchlistEntry.personalRating && (
-                      <p className="text-yellow-400 text-sm mt-1 font-semibold">
+                      <p className="text-yellow-500 dark:text-yellow-400 text-sm mt-1 font-semibold">
                         {watchlistEntry.personalRating}/10
                       </p>
                     )}
@@ -293,27 +291,27 @@ export default function TitleDetail() {
 
                   {/* Notes */}
                   <div>
-                    <p className="text-xs text-gray-400 mb-2">Notes</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Notes</p>
                     <textarea
                       value={notes}
                       onChange={e => setNotes(e.target.value)}
                       rows={3}
-                      className="input-dark text-sm resize-none"
-                      placeholder="Your thoughts, favorite moments…"
+                      className="input-field text-sm resize-none"
+                      placeholder="Your thoughts, favorite moments..."
                     />
                     <button
                       onClick={handleNoteSave}
                       disabled={saving || notes === (watchlistEntry.notes || '')}
                       className="mt-2 btn-primary text-xs py-1.5 px-3 disabled:opacity-40"
                     >
-                      {saving ? 'Saving…' : 'Save notes'}
+                      {saving ? 'Saving...' : 'Save notes'}
                     </button>
                   </div>
 
                   {/* Remove */}
                   <button
                     onClick={handleRemove}
-                    className="text-xs text-red-500/60 hover:text-red-400 transition-colors"
+                    className="text-xs text-red-400 hover:text-red-500 dark:text-red-500/60 dark:hover:text-red-400 transition-colors"
                   >
                     Remove from watchlist
                   </button>
@@ -336,10 +334,10 @@ export default function TitleDetail() {
                       <button
                         key={list.id}
                         onClick={() => handleAddToList(list.id)}
-                        className="w-full text-left text-sm text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg transition-colors"
+                        className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition-colors"
                       >
                         {list.name}
-                        <span className="text-gray-600 ml-2">{list._count?.items ?? 0} titles</span>
+                        <span className="text-gray-400 dark:text-gray-600 ml-2">{list._count?.items ?? 0} titles</span>
                       </button>
                     ))}
                   </div>

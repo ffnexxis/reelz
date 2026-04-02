@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { adminApi } from '../api/client';
 
 const ROLE_STYLES = {
-  ADMIN: 'bg-brand-100 text-brand-700',
-  USER: 'bg-gray-100 text-gray-600',
+  ADMIN: 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400',
+  USER: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400',
 };
 
 export default function Users() {
@@ -39,15 +39,15 @@ export default function Users() {
     });
 
   const SortIcon = ({ col }) => {
-    if (sortBy !== col) return <span className="text-gray-300">↕</span>;
-    return <span className="text-brand-600">{sortDir === 'asc' ? '↑' : '↓'}</span>;
+    if (sortBy !== col) return <span className="text-gray-300 dark:text-gray-600">^v</span>;
+    return <span className="text-brand-600 dark:text-brand-400">{sortDir === 'asc' ? '^' : 'v'}</span>;
   };
 
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-        <p className="text-gray-500 text-sm mt-1">{users.length} registered accounts</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Users</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{users.length} registered accounts</p>
       </div>
 
       {/* Search */}
@@ -61,7 +61,7 @@ export default function Users() {
           <input
             type="text"
             className="input pl-10"
-            placeholder="Filter by email…"
+            placeholder="Filter by email..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -76,25 +76,25 @@ export default function Users() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <button onClick={() => toggleSort('email')} className="flex items-center gap-1.5 hover:text-gray-700">
+              <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <button onClick={() => toggleSort('email')} className="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-gray-200">
                     Email <SortIcon col="email" />
                   </button>
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <button onClick={() => toggleSort('watchlist')} className="flex items-center gap-1.5 hover:text-gray-700">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <button onClick={() => toggleSort('watchlist')} className="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-gray-200">
                     Watchlist <SortIcon col="watchlist" />
                   </button>
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <button onClick={() => toggleSort('lists')} className="flex items-center gap-1.5 hover:text-gray-700">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <button onClick={() => toggleSort('lists')} className="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-gray-200">
                     Lists <SortIcon col="lists" />
                   </button>
                 </th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <button onClick={() => toggleSort('createdAt')} className="flex items-center gap-1.5 hover:text-gray-700">
+                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <button onClick={() => toggleSort('createdAt')} className="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-gray-200">
                     Joined <SortIcon col="createdAt" />
                   </button>
                 </th>
@@ -113,19 +113,19 @@ export default function Users() {
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-purple-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
                           {user.email[0].toUpperCase()}
                         </div>
-                        <span className="font-medium text-gray-800">{user.email}</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">{user.email}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`badge ${ROLE_STYLES[user.role]}`}>{user.role}</span>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                       <span className="font-medium">{user._count.watchlistEntries}</span>
-                      <span className="text-gray-400 ml-1">titles</span>
+                      <span className="text-gray-400 dark:text-gray-500 ml-1">titles</span>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                       <span className="font-medium">{user._count.customLists}</span>
-                      <span className="text-gray-400 ml-1">lists</span>
+                      <span className="text-gray-400 dark:text-gray-500 ml-1">lists</span>
                     </td>
                     <td className="px-6 py-4 text-gray-400 text-xs">
                       {new Date(user.createdAt).toLocaleDateString('en-US', {

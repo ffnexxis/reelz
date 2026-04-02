@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const NAV = [
   {
@@ -42,6 +43,7 @@ const NAV = [
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -50,9 +52,9 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-60 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col min-h-screen">
+    <aside className="w-60 flex-shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col min-h-screen">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-gray-100">
+      <div className="px-5 py-5 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-sm">
             <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -60,7 +62,7 @@ export default function Sidebar() {
             </svg>
           </div>
           <div>
-            <p className="font-bold text-gray-900 leading-none">Reelz</p>
+            <p className="font-bold text-gray-900 dark:text-gray-100 leading-none">Reelz</p>
             <p className="text-xs text-gray-400 leading-tight">Admin Panel</p>
           </div>
         </div>
@@ -85,20 +87,39 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* User */}
-      <div className="px-3 py-4 border-t border-gray-100">
+      {/* Theme toggle + User */}
+      <div className="px-3 py-4 border-t border-gray-100 dark:border-gray-800">
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-150 mb-2"
+        >
+          <span className="w-5 h-5 flex items-center justify-center">
+            {theme === 'dark' ? (
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </span>
+          {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+        </button>
+
         <div className="flex items-center gap-2.5 px-3 py-2">
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
             {user?.email?.[0]?.toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-gray-700 truncate">{user?.email}</p>
-            <p className="text-xs text-brand-600 font-medium">Admin</p>
+            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{user?.email}</p>
+            <p className="text-xs text-brand-600 dark:text-brand-400 font-medium">Admin</p>
           </div>
           <button
             onClick={handleLogout}
             title="Sign out"
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

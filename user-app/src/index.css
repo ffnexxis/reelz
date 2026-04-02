@@ -4,54 +4,54 @@
 
 @layer base {
   * {
-    @apply border-gray-800;
+    @apply border-gray-200 dark:border-gray-800;
   }
   body {
-    @apply bg-gray-950 text-gray-100;
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
   }
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-gray-900;
+    @apply bg-gray-100 dark:bg-gray-900;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-700 rounded-full;
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
+    @apply bg-gray-400 dark:bg-gray-500;
   }
 }
 
 @layer components {
   .poster-card {
-    @apply relative rounded-xl overflow-hidden bg-gray-900 cursor-pointer transition-all duration-300;
+    @apply relative rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-900 cursor-pointer transition-all duration-300;
     @apply hover:scale-105 hover:shadow-2xl hover:shadow-reelz-500/20;
   }
   .poster-img {
     @apply w-full aspect-[2/3] object-cover;
   }
   .poster-overlay {
-    @apply absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent;
+    @apply absolute inset-0 bg-gradient-to-t from-gray-100 via-gray-100/50 to-transparent dark:from-gray-950 dark:via-gray-950/50 dark:to-transparent;
     @apply opacity-0 group-hover:opacity-100 transition-opacity duration-300;
   }
   .btn-primary {
     @apply bg-reelz-600 hover:bg-reelz-500 text-white font-semibold px-4 py-2 rounded-lg transition-colors duration-200;
   }
   .btn-secondary {
-    @apply bg-gray-800 hover:bg-gray-700 text-gray-100 font-medium px-4 py-2 rounded-lg transition-colors duration-200;
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 font-medium px-4 py-2 rounded-lg transition-colors duration-200;
   }
-  .input-dark {
-    @apply bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-4 py-2.5 w-full;
+  .input-field {
+    @apply bg-white border border-gray-300 text-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 rounded-lg px-4 py-2.5 w-full;
     @apply focus:outline-none focus:border-reelz-500 focus:ring-1 focus:ring-reelz-500 transition-colors;
-    @apply placeholder:text-gray-500;
+    @apply placeholder:text-gray-400 dark:placeholder:text-gray-500;
   }
   .badge {
     @apply text-xs font-medium px-2 py-0.5 rounded-full;
   }
   .card-glass {
-    @apply bg-gray-900/60 backdrop-blur-sm border border-gray-800 rounded-xl;
+    @apply bg-white/80 dark:bg-gray-900/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-xl;
   }
 }
 

@@ -6,16 +6,16 @@ const TMDB_IMG = 'https://image.tmdb.org/t/p/w185';
 const PLACEHOLDER = 'https://placehold.co/185x278/1f2937/9ca3af?text=No+Poster';
 
 const STATUSES = [
-  { value: '', label: 'All', color: 'text-gray-300' },
-  { value: 'WANT_TO_WATCH', label: 'Want to Watch', color: 'text-gray-400' },
-  { value: 'WATCHING', label: 'Watching', color: 'text-blue-400' },
-  { value: 'WATCHED', label: 'Watched', color: 'text-green-400' },
+  { value: '', label: 'All', color: 'text-gray-500 dark:text-gray-300' },
+  { value: 'WANT_TO_WATCH', label: 'Want to Watch', color: 'text-gray-500 dark:text-gray-400' },
+  { value: 'WATCHING', label: 'Watching', color: 'text-blue-500 dark:text-blue-400' },
+  { value: 'WATCHED', label: 'Watched', color: 'text-green-500 dark:text-green-400' },
 ];
 
 const STATUS_STYLES = {
-  WATCHED: 'bg-green-500/20 text-green-400 border border-green-500/30',
-  WATCHING: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-  WANT_TO_WATCH: 'bg-gray-600/30 text-gray-400 border border-gray-600/40',
+  WATCHED: 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30',
+  WATCHING: 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30',
+  WANT_TO_WATCH: 'bg-gray-200/50 dark:bg-gray-600/30 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600/40',
 };
 
 function StarRating({ value, onChange }) {
@@ -29,15 +29,15 @@ function StarRating({ value, onChange }) {
           onMouseEnter={() => setHovered(n)}
           onMouseLeave={() => setHovered(null)}
           className={`text-sm transition-colors ${
-            n <= (hovered ?? value ?? 0) ? 'text-yellow-400' : 'text-gray-700'
+            n <= (hovered ?? value ?? 0) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-700'
           }`}
           title={`${n}/10`}
         >
-          ★
+          *
         </button>
       ))}
       {value && (
-        <span className="ml-1 text-xs text-yellow-400 font-medium">{value}/10</span>
+        <span className="ml-1 text-xs text-yellow-500 dark:text-yellow-400 font-medium">{value}/10</span>
       )}
     </div>
   );
@@ -71,7 +71,7 @@ function WatchlistItem({ entry, onUpdate, onRemove }) {
   };
 
   return (
-    <div className="card-glass p-4 flex gap-4 group transition-all hover:border-gray-700">
+    <div className="card-glass p-4 flex gap-4 group transition-all hover:border-gray-300 dark:hover:border-gray-700">
       {/* Poster */}
       <Link to={`/title/${title.tmdbId}?type=${mediaType}`} className="flex-shrink-0">
         <img
@@ -88,7 +88,7 @@ function WatchlistItem({ entry, onUpdate, onRemove }) {
           <div>
             <Link
               to={`/title/${title.tmdbId}?type=${mediaType}`}
-              className="font-semibold text-white hover:text-reelz-400 transition-colors line-clamp-1"
+              className="font-semibold text-gray-900 dark:text-white hover:text-reelz-600 dark:hover:text-reelz-400 transition-colors line-clamp-1"
             >
               {title.title}
             </Link>
@@ -96,7 +96,7 @@ function WatchlistItem({ entry, onUpdate, onRemove }) {
               {title.releaseYear && (
                 <span className="text-xs text-gray-500">{title.releaseYear}</span>
               )}
-              <span className={`badge text-xs ${title.mediaType === 'TV' ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'}`}>
+              <span className={`badge text-xs ${title.mediaType === 'TV' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-purple-500/20 text-purple-600 dark:text-purple-400'}`}>
                 {title.mediaType === 'TV' ? 'TV' : 'Movie'}
               </span>
             </div>
@@ -105,13 +105,13 @@ function WatchlistItem({ entry, onUpdate, onRemove }) {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => setEditing(!editing)}
-              className="text-xs text-gray-500 hover:text-gray-300 opacity-0 group-hover:opacity-100 transition-all"
+              className="text-xs text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 transition-all"
             >
               {editing ? 'Cancel' : 'Edit'}
             </button>
             <button
               onClick={() => onRemove(entry.id)}
-              className="text-xs text-red-500/50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+              className="text-xs text-red-400 hover:text-red-500 dark:text-red-500/50 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
             >
               Remove
             </button>
@@ -127,7 +127,7 @@ function WatchlistItem({ entry, onUpdate, onRemove }) {
               className={`badge text-xs px-2 py-0.5 transition-all ${
                 status === s.value
                   ? STATUS_STYLES[s.value]
-                  : 'bg-gray-800 text-gray-500 hover:bg-gray-700'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
             >
               {s.label}
@@ -144,22 +144,22 @@ function WatchlistItem({ entry, onUpdate, onRemove }) {
         {title.genres?.length > 0 && (
           <div className="flex gap-1 mt-2 flex-wrap">
             {title.genres.slice(0, 3).map(g => (
-              <span key={g} className="badge bg-gray-800/60 text-gray-500 text-xs">{g}</span>
+              <span key={g} className="badge bg-gray-100 dark:bg-gray-800/60 text-gray-500 text-xs">{g}</span>
             ))}
           </div>
         )}
 
         {/* Edit panel */}
         {editing && (
-          <div className="mt-3 pt-3 border-t border-gray-800 space-y-3">
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-800 space-y-3">
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">Notes</label>
+              <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Notes</label>
               <textarea
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
                 rows={2}
-                className="input-dark text-sm resize-none"
-                placeholder="Your thoughts…"
+                className="input-field text-sm resize-none"
+                placeholder="Your thoughts..."
               />
             </div>
             <button
@@ -167,7 +167,7 @@ function WatchlistItem({ entry, onUpdate, onRemove }) {
               disabled={saving}
               className="btn-primary text-xs py-1.5 px-3"
             >
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? 'Saving...' : 'Save'}
             </button>
           </div>
         )}
@@ -224,8 +224,8 @@ export default function Watchlist() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-1">My Watchlist</h1>
-        <p className="text-gray-400">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">My Watchlist</h1>
+        <p className="text-gray-500 dark:text-gray-400">
           {entries.length} {entries.length === 1 ? 'title' : 'titles'} tracked
         </p>
       </div>
@@ -240,11 +240,11 @@ export default function Watchlist() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filter === s.value
                   ? 'bg-reelz-600 text-white shadow-lg shadow-reelz-500/20'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
             >
               {s.label}
-              <span className={`ml-1.5 text-xs ${filter === s.value ? 'text-reelz-200' : 'text-gray-600'}`}>
+              <span className={`ml-1.5 text-xs ${filter === s.value ? 'text-reelz-200' : 'text-gray-400 dark:text-gray-600'}`}>
                 {counts[s.value]}
               </span>
             </button>
@@ -255,11 +255,11 @@ export default function Watchlist() {
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value)}
-            className="input-dark text-sm py-2 w-full sm:w-auto"
+            className="input-field text-sm py-2 w-full sm:w-auto"
           >
             <option value="recent">Recently added</option>
             <option value="rating">Highest rated</option>
-            <option value="title">Title A–Z</option>
+            <option value="title">Title A-Z</option>
           </select>
         </div>
       </div>
@@ -271,14 +271,13 @@ export default function Watchlist() {
         </div>
       ) : sorted.length === 0 ? (
         <div className="text-center py-20 text-gray-500">
-          <p className="text-5xl mb-4">🍿</p>
-          <p className="text-lg font-medium text-gray-400">
+          <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
             {filter ? 'No titles with this status' : 'Your watchlist is empty'}
           </p>
           <p className="text-sm mt-1">
             {filter ? 'Try a different filter' : (
               <>
-                <Link to="/" className="text-reelz-400 hover:text-reelz-300">Discover titles</Link> to add them here
+                <Link to="/" className="text-reelz-600 dark:text-reelz-400 hover:text-reelz-500 dark:hover:text-reelz-300">Discover titles</Link> to add them here
               </>
             )}
           </p>

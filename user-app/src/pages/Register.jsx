@@ -44,23 +44,23 @@ export default function Register() {
               <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white">Start tracking</h1>
-          <p className="text-gray-400 mt-1">Create your free Reelz account</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Start tracking</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Create your free Reelz account</p>
         </div>
 
         <div className="card-glass p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm px-4 py-3 rounded-lg">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
               <input
                 type="email"
-                className="input-dark"
+                className="input-field"
                 placeholder="you@example.com"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
@@ -70,10 +70,10 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
               <input
                 type="password"
-                className="input-dark"
+                className="input-field"
                 placeholder="At least 6 characters"
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
@@ -82,11 +82,11 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Confirm password</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Confirm password</label>
               <input
                 type="password"
-                className="input-dark"
-                placeholder="••••••••"
+                className="input-field"
+                placeholder="--------"
                 value={form.confirm}
                 onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))}
                 required
@@ -99,14 +99,14 @@ export default function Register() {
               className="btn-primary w-full py-3 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-              {loading ? 'Creating account…' : 'Create account'}
+              {loading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-sm">
               Already have an account?{' '}
-              <Link to="/login" className="text-reelz-400 hover:text-reelz-300 font-medium transition-colors">
+              <Link to="/login" className="text-reelz-600 dark:text-reelz-400 hover:text-reelz-500 dark:hover:text-reelz-300 font-medium transition-colors">
                 Sign in
               </Link>
             </p>

@@ -4,9 +4,9 @@ const TMDB_IMG = 'https://image.tmdb.org/t/p/w342';
 const PLACEHOLDER = 'https://placehold.co/342x513/1f2937/9ca3af?text=No+Poster';
 
 const STATUS_COLORS = {
-  WATCHED: 'bg-green-500/20 text-green-400 border border-green-500/30',
-  WATCHING: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-  WANT_TO_WATCH: 'bg-gray-600/30 text-gray-400 border border-gray-600/40',
+  WATCHED: 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30',
+  WATCHING: 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30',
+  WANT_TO_WATCH: 'bg-gray-200/50 dark:bg-gray-600/30 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600/40',
 };
 
 const STATUS_LABELS = {
@@ -54,7 +54,7 @@ export default function PosterCard({ title, onAdd, onStatusChange, watchlistEntr
           <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <p className="text-white font-semibold text-sm leading-tight line-clamp-2">{title.title}</p>
             {title.releaseYear && (
-              <p className="text-gray-400 text-xs mt-0.5">{title.releaseYear}</p>
+              <p className="text-gray-300 text-xs mt-0.5">{title.releaseYear}</p>
             )}
           </div>
         )}

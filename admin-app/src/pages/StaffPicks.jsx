@@ -15,7 +15,7 @@ function useDebounce(value, delay) {
 
 function SearchResult({ result, onAdd }) {
   return (
-    <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+    <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
       <img
         src={result.posterPath ? `${TMDB_IMG}${result.posterPath}` : PLACEHOLDER}
         alt={result.title}
@@ -23,9 +23,9 @@ function SearchResult({ result, onAdd }) {
         onError={e => { e.target.src = PLACEHOLDER; }}
       />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-800 line-clamp-1">{result.title}</p>
+        <p className="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-1">{result.title}</p>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <span className={`badge text-xs ${result.mediaType === 'TV' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>
+          <span className={`badge text-xs ${result.mediaType === 'TV' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'}`}>
             {result.mediaType === 'TV' ? 'TV' : 'Movie'}
           </span>
           {result.releaseYear && (
@@ -68,9 +68,9 @@ function PickCard({ pick, onRemove }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="font-semibold text-gray-900 line-clamp-1">{title.title}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">{title.title}</h3>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`badge text-xs ${title.mediaType === 'TV' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>
+              <span className={`badge text-xs ${title.mediaType === 'TV' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'}`}>
                 {title.mediaType === 'TV' ? 'TV' : 'Movie'}
               </span>
               {title.releaseYear && (
@@ -83,24 +83,24 @@ function PickCard({ pick, onRemove }) {
             disabled={removing}
             className="btn-danger text-xs py-1.5 px-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
           >
-            {removing ? '…' : 'Remove'}
+            {removing ? '...' : 'Remove'}
           </button>
         </div>
 
         {pick.note && (
-          <p className="text-sm text-gray-500 italic mt-2 line-clamp-2">"{pick.note}"</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 italic mt-2 line-clamp-2">"{pick.note}"</p>
         )}
 
         {title.genres?.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
             {title.genres.slice(0, 3).map(g => (
-              <span key={g} className="badge bg-gray-100 text-gray-500 text-xs">{g}</span>
+              <span key={g} className="badge bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs">{g}</span>
             ))}
           </div>
         )}
 
         <div className="mt-2 text-xs text-gray-400">
-          Featured by {pick.addedBy?.email} · {new Date(pick.featuredAt).toLocaleDateString()}
+          Featured by {pick.addedBy?.email} / {new Date(pick.featuredAt).toLocaleDateString()}
         </div>
       </div>
     </div>
@@ -177,14 +177,14 @@ export default function StaffPicks() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Staff Picks</h1>
-        <p className="text-gray-500 text-sm mt-1">Curate featured titles shown to all users on the home screen</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Staff Picks</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Curate featured titles shown to all users on the home screen</p>
       </div>
 
       {/* Search to add */}
       <div className="card p-6 mb-8">
-        <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-bold">+</span>
+        <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 flex items-center justify-center text-xs font-bold">+</span>
           Feature a new title
         </h2>
 
@@ -202,7 +202,7 @@ export default function StaffPicks() {
             <input
               type="text"
               className="input pl-10"
-              placeholder="Search TMDB for a movie or TV show…"
+              placeholder="Search TMDB for a movie or TV show..."
               value={query}
               onChange={e => setQuery(e.target.value)}
             />
@@ -213,7 +213,7 @@ export default function StaffPicks() {
                 key={t}
                 onClick={() => setFilter(t)}
                 className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  filter === t ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  filter === t ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
                 {t === 'multi' ? 'All' : t === 'movie' ? 'Movies' : 'TV'}
@@ -224,7 +224,7 @@ export default function StaffPicks() {
 
         {/* Search results */}
         {searchResults.length > 0 && (
-          <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 max-h-72 overflow-y-auto">
+          <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden divide-y divide-gray-100 dark:divide-gray-800 max-h-72 overflow-y-auto">
             {searchResults.slice(0, 8).map(result => (
               <SearchResult key={`${result.tmdbId}-${result.mediaType}`} result={result} onAdd={handleSelectForPick} />
             ))}
@@ -233,7 +233,7 @@ export default function StaffPicks() {
 
         {/* Note editor */}
         {noteFor && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3 mb-3">
               <img
                 src={noteFor.posterPath ? `${TMDB_IMG}${noteFor.posterPath}` : PLACEHOLDER}
@@ -242,12 +242,12 @@ export default function StaffPicks() {
                 onError={e => { e.target.src = PLACEHOLDER; }}
               />
               <div>
-                <p className="font-medium text-gray-800">{noteFor.title}</p>
-                <p className="text-xs text-gray-400">{noteFor.releaseYear} · {noteFor.mediaType}</p>
+                <p className="font-medium text-gray-800 dark:text-gray-200">{noteFor.title}</p>
+                <p className="text-xs text-gray-400">{noteFor.releaseYear} / {noteFor.mediaType}</p>
               </div>
             </div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">
-              Editorial note (optional — shown to users)
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+              Editorial note (optional -- shown to users)
             </label>
             <input
               type="text"
@@ -263,7 +263,7 @@ export default function StaffPicks() {
                 className="btn-primary flex items-center gap-2"
               >
                 {adding && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
-                {adding ? 'Adding…' : '★ Feature This Title'}
+                {adding ? 'Adding...' : 'Feature This Title'}
               </button>
               <button onClick={() => setNoteFor(null)} className="btn-secondary">Cancel</button>
             </div>
@@ -274,8 +274,8 @@ export default function StaffPicks() {
       {/* Picks list */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900">Current Staff Picks</h2>
-          <span className="badge bg-brand-100 text-brand-700 text-xs px-2.5 py-1">
+          <h2 className="font-semibold text-gray-900 dark:text-gray-100">Current Staff Picks</h2>
+          <span className="badge bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 text-xs px-2.5 py-1">
             {picks.length} featured
           </span>
         </div>
@@ -286,7 +286,6 @@ export default function StaffPicks() {
           </div>
         ) : picks.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
-            <p className="text-4xl mb-3">⭐</p>
             <p>No staff picks yet. Search above to add the first one!</p>
           </div>
         ) : (
