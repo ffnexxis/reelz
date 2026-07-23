@@ -11,6 +11,43 @@ const tmdb = axios.create({
   params: { api_key: API_KEY },
 });
 
+// ── Content safety filtering ─────────────────────────────────────────────────
+// TMDB's `adult` flag only marks outright pornography. Many explicit-but-catalogued
+// titles (e.g. Japanese "pink films") are NOT flagged adult, so we layer defenses:
+//   1. drop anything TMDB does flag as adult
+//   2. drop an env/seed blocklist of specific offending tmdbIds (hard backstop)
+//   3. drop titles whose name/overview match an explicit-keyword pattern
+// The primary defense for the Popular shelf is a vote_count threshold on /discover
+// (see getPopularTitles) — obscure fringe titles have almost no votes.
+const SEED_BLOCKED_IDS = [261639, 200066]; // known explicit titles that pass TMDB's adult flag
+
+const BLOCKED_TMDB_IDS = new Set([
+  ...SEED_BLOCKED_IDS,
+  ...(process.env.BLOCKED_TMDB_IDS || '')
+    .split(',')
+    .map(s => parseInt(s.trim(), 10))
+    .filter(Number.isFinite),
+]);
+
+// Conservative on purpose: only terms that effectively never appear in mainstream
+// release titles. Deliberately excludes bare "sex"/"nude" so legitimate titles
+// (e.g. "Sex Education", "Sex and the City") are not hidden.
+const EXPLICIT_PATTERN = /\b(porn|pornographic|xxx|hardcore|softcore|hentai|erotica)\b/i;
+
+function isBlockedRaw(r) {
+  if (!r) return true;
+  if (r.adult === true) return true;
+  if (BLOCKED_TMDB_IDS.has(r.id)) return true;
+  const text = `${r.title || r.name || ''} ${r.overview || ''}`;
+  return EXPLICIT_PATTERN.test(text);
+}
+
+// Filter raw TMDB result objects (before normalization) so we can inspect
+// `adult`, `id`, `title/name`, and `overview`.
+function sanitizeRaw(results = []) {
+  return results.filter(r => !isBlockedRaw(r));
+}
+
 async function cachedGet(url, params = {}) {
   const key = url + JSON.stringify(params);
   const cached = cache.get(key);
@@ -27,7 +64,7 @@ async function searchTitles(query, type = 'multi') {
   }
   const endpoint = type === 'movie' ? '/search/movie' : type === 'tv' ? '/search/tv' : '/search/multi';
   const data = await cachedGet(endpoint, { query, include_adult: false });
-  return data.results
+  return sanitizeRaw(data.results)
     .filter(r => r.media_type !== 'person' || type !== 'multi')
     .map(normalizeTmdbResult);
 }
@@ -48,9 +85,23 @@ async function getPopularTitles(mediaType = 'movie') {
   if (!API_KEY) {
     return getMockPopular();
   }
-  const endpoint = mediaType === 'tv' ? '/tv/popular' : '/movie/popular';
-  const data = await cachedGet(endpoint);
-  return data.results.slice(0, 20).map(r => normalizeTmdbResult({ ...r, media_type: mediaType }));
+  // Use /discover instead of /popular so we can enforce include_adult + a vote_count
+  // floor. The threshold is the key safety lever: obscure explicit/fringe titles have
+  // almost no votes, and it also yields a shelf of recognizable, well-known titles.
+  const isTV = mediaType === 'tv';
+  const endpoint = isTV ? '/discover/tv' : '/discover/movie';
+  const params = {
+    include_adult: false,
+    sort_by: 'popularity.desc',
+    'vote_count.gte': 300,
+  };
+  if (isTV) {
+    params.without_genres = '10763,10767'; // exclude News and Talk shows
+  }
+  const data = await cachedGet(endpoint, params);
+  return sanitizeRaw(data.results)
+    .slice(0, 20)
+    .map(r => normalizeTmdbResult({ ...r, media_type: mediaType }));
 }
 
 function normalizeTmdbResult(r) {
