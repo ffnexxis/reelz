@@ -71,7 +71,8 @@ export default function Home() {
         posterPath: title.posterPath,
         overview: title.overview,
         releaseYear: title.releaseYear,
-        genres: title.genres || [],
+        // No `genres`: search/popular results don't carry genre names
+        // (details endpoint populates them; see backend/src/lib/tmdb.js).
       });
       setWatchlist(wl => [...wl, data.entry]);
       showToast(`"${title.title}" added to watchlist!`);

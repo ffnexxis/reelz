@@ -118,7 +118,10 @@ function normalizeTmdbResult(r) {
       ? parseInt(r.first_air_date.slice(0, 4))
       : null,
     voteAverage: r.vote_average,
-    genres: r.genre_ids || [],
+    // NOTE: no `genres` here — list endpoints only expose numeric genre_ids,
+    // while Title.genres stores genre *names* (populated by getTitleDetails).
+    // Emitting ids caused clients to forward them into write endpoints that
+    // validate z.array(z.string()) (400s) or, worse, store id-strings.
   };
 }
 

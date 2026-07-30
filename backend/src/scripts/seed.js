@@ -59,6 +59,107 @@ async function main() {
     });
   }
 
+  // ── Social layer: demo characters (idempotent — safe to re-run) ────────────
+  const demoHash = await bcrypt.hash('demo123', 12);
+  const demoProfiles = [
+    { email: 'dan@reelz.dev', displayName: 'Dan', avatarColor: '#e11d48' },
+    { email: 'chris@reelz.dev', displayName: 'Chris', avatarColor: '#0ea5e9' },
+    { email: 'lisa@reelz.dev', displayName: 'Lisa', avatarColor: '#8b5cf6' },
+    { email: 'john@reelz.dev', displayName: 'John', avatarColor: '#f59e0b' },
+    { email: 'maria@reelz.dev', displayName: 'Maria', avatarColor: '#10b981' },
+    { email: 'sam@reelz.dev', displayName: 'Sam', avatarColor: '#ec4899' },
+  ];
+
+  const demoUsers = [];
+  for (const profile of demoProfiles) {
+    demoUsers.push(
+      await prisma.user.upsert({
+        where: { email: profile.email },
+        update: { displayName: profile.displayName, avatarColor: profile.avatarColor },
+        create: { ...profile, passwordHash: demoHash, role: 'USER' },
+      })
+    );
+  }
+  const [dan, chris, lisa, john, maria, sam] = demoUsers;
+
+  // Demo watch activity (drives the feed for anyone following them)
+  const demoEntries = [
+    { user: dan, title: titles[0], status: 'WATCHED', personalRating: 8 },
+    { user: dan, title: titles[2], status: 'WATCHING' },
+    { user: chris, title: titles[1], status: 'WATCHED', personalRating: 10 },
+    { user: lisa, title: titles[2], status: 'WATCHED', personalRating: 9 },
+    { user: john, title: titles[0], status: 'WANT_TO_WATCH' },
+    { user: maria, title: titles[1], status: 'WATCHING' },
+    { user: sam, title: titles[2], status: 'WANT_TO_WATCH' },
+  ];
+  for (const e of demoEntries) {
+    await prisma.watchlistEntry.upsert({
+      where: { userId_titleId: { userId: e.user.id, titleId: e.title.id } },
+      update: {},
+      create: {
+        userId: e.user.id,
+        titleId: e.title.id,
+        status: e.status,
+        personalRating: e.personalRating || null,
+        watchedAt: e.status === 'WATCHED' ? new Date() : null,
+      },
+    });
+  }
+
+  // Follows among demo users + demo user follows for the sample user
+  const followPairs = [
+    [dan, chris], [dan, lisa], [chris, dan], [chris, maria],
+    [lisa, dan], [lisa, sam], [john, dan], [maria, chris],
+    [sam, lisa], [user, dan], [user, chris], [user, lisa],
+  ];
+  for (const [follower, following] of followPairs) {
+    await prisma.follow.upsert({
+      where: { followerId_followingId: { followerId: follower.id, followingId: following.id } },
+      update: {},
+      create: { followerId: follower.id, followingId: following.id },
+    });
+  }
+
+  // Sample posts + comments (only when no posts exist yet)
+  const postCount = await prisma.post.count();
+  if (postCount === 0) {
+    const danPost = await prisma.post.create({
+      data: {
+        userId: dan.id,
+        body: 'Finally watched this — the first rule is not to talk about it, but I have to. Instant top 10.',
+        titleId: titles[0].id,
+      },
+    });
+    const lisaPost = await prisma.post.create({
+      data: {
+        userId: lisa.id,
+        body: 'Weekend binge complete. What should I start next?',
+        titleId: titles[2].id,
+      },
+    });
+    await prisma.post.create({
+      data: {
+        userId: chris.id,
+        body: 'Hot take: the sequel is even better than the original.',
+        titleId: titles[1].id,
+      },
+    });
+
+    await prisma.comment.create({
+      data: { postId: danPost.id, userId: chris.id, body: 'Told you it would hold up!' },
+    });
+    await prisma.comment.create({
+      data: { postId: danPost.id, userId: lisa.id, body: 'The twist got me too.' },
+    });
+    await prisma.comment.create({
+      data: { postId: lisaPost.id, userId: sam.id, body: 'Better Call Saul, no question.' },
+    });
+
+    await prisma.like.create({ data: { userId: lisa.id, postId: danPost.id } });
+    await prisma.like.create({ data: { userId: chris.id, postId: danPost.id } });
+    await prisma.like.create({ data: { userId: dan.id, postId: lisaPost.id } });
+  }
+
   console.log('✅ Seed complete!');
   console.log('   Admin: admin@reelz.dev / admin123');
   console.log('   User:  user@reelz.dev  / user123');

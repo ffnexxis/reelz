@@ -84,3 +84,41 @@ export const adminApi = {
   removeStaffPick: (id) => api.delete(`/admin/staff-picks/${id}`),
   getTrending: () => api.get('/admin/trending'),
 };
+
+// ── Users ─────────────────────────────────────────────────────────────────────
+export const usersApi = {
+  search: (q) => api.get('/users/search', { params: { q } }),
+  getMe: () => api.get('/users/me'),
+  updateMe: (data) => api.patch('/users/me', data),
+  getProfile: (id) => api.get(`/users/${id}`),
+  getFollowers: (id) => api.get(`/users/${id}/followers`),
+  getFollowing: (id) => api.get(`/users/${id}/following`),
+  follow: (id) => api.post(`/users/${id}/follow`),
+  unfollow: (id) => api.delete(`/users/${id}/follow`),
+};
+
+// ── Posts ─────────────────────────────────────────────────────────────────────
+export const postsApi = {
+  create: (payload) => api.post('/posts', payload), // payload = { body, title? }
+  getOne: (id) => api.get(`/posts/${id}`),
+  remove: (id) => api.delete(`/posts/${id}`),
+  addComment: (postId, body) => api.post(`/posts/${postId}/comments`, { body }),
+};
+
+// ── Likes ─────────────────────────────────────────────────────────────────────
+export const likesApi = {
+  like: (type, id) => api.post(`/likes/${type}/${id}`), // type: 'post' | 'activity'
+  unlike: (type, id) => api.delete(`/likes/${type}/${id}`),
+};
+
+// ── Feed ──────────────────────────────────────────────────────────────────────
+export const feedApi = {
+  get: (limit = 30) => api.get('/feed', { params: { limit } }),
+};
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+export const notificationsApi = {
+  getAll: () => api.get('/notifications'),
+  getUnreadCount: () => api.get('/notifications/unread-count'),
+  markAllRead: () => api.post('/notifications/read-all'),
+};

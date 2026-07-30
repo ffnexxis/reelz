@@ -9,6 +9,11 @@ const authRoutes = require('./routes/auth');
 const titlesRoutes = require('./routes/titles');
 const watchlistRoutes = require('./routes/watchlist');
 const listsRoutes = require('./routes/lists');
+const usersRoutes = require('./routes/users');
+const postsRoutes = require('./routes/posts');
+const likesRoutes = require('./routes/likes');
+const feedRoutes = require('./routes/feed');
+const notificationsRoutes = require('./routes/notifications');
 const adminRoutes = require('./routes/admin');
 
 const app = express();
@@ -41,6 +46,11 @@ app.use('/auth', authLimiter, authRoutes);
 app.use('/titles', titlesRoutes);
 app.use('/watchlist', watchlistRoutes);
 app.use('/lists', listsRoutes);
+app.use('/users', usersRoutes);
+app.use('/posts', postsRoutes);
+app.use('/likes', likesRoutes);
+app.use('/feed', feedRoutes);
+app.use('/notifications', notificationsRoutes);
 app.use('/admin', adminRoutes);
 
 // Health check

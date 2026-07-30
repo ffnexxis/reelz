@@ -107,7 +107,9 @@ const staffPickSchema = z.object({
   posterPath: z.string().nullable().optional(),
   overview: z.string().nullable().optional(),
   releaseYear: z.number().int().nullable().optional(),
-  genres: z.array(z.union([z.string(), z.number().transform(n => String(n))])).optional(),
+  // Genre *names* only — stringified numeric TMDB ids must never reach
+  // Title.genres (they'd pollute the Dashboard genre tally).
+  genres: z.array(z.string()).optional(),
   note: z.string().optional(),
 });
 
@@ -122,7 +124,15 @@ router.post('/staff-picks', async (req, res) => {
 
   const dbTitle = await prisma.title.upsert({
     where: { tmdbId_mediaType: { tmdbId, mediaType } },
-    update: { title, posterPath, overview, releaseYear, genres: genres || [] },
+    // Non-destructive: don't clobber existing Title fields (esp. genre names)
+    // when the staff-pick payload omits them.
+    update: {
+      title,
+      posterPath: posterPath ?? undefined,
+      overview: overview ?? undefined,
+      releaseYear: releaseYear ?? undefined,
+      ...(genres && genres.length ? { genres } : {}),
+    },
     create: { tmdbId, mediaType, title, posterPath, overview, releaseYear, genres: genres || [] },
   });
 

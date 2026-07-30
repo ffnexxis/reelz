@@ -1,10 +1,14 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useNotifications } from '../contexts/NotificationsContext';
+import UserAvatar from './UserAvatar';
+import { getDisplayName } from '../utils/displayName';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -37,6 +41,8 @@ export default function Navbar() {
           {user && (
             <nav className="hidden sm:flex items-center gap-1">
               <NavLink to="/" end className={navLinkClass}>Discover</NavLink>
+              <NavLink to="/feed" className={navLinkClass}>Feed</NavLink>
+              <NavLink to="/people" className={navLinkClass}>People</NavLink>
               <NavLink to="/watchlist" className={navLinkClass}>Watchlist</NavLink>
               <NavLink to="/lists" className={navLinkClass}>My Lists</NavLink>
             </nav>
@@ -63,12 +69,26 @@ export default function Navbar() {
 
             {user ? (
               <>
-                <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-reelz-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
-                    {user.email[0].toUpperCase()}
-                  </div>
-                  <span className="max-w-[120px] truncate">{user.email}</span>
-                </div>
+                {/* Notification bell */}
+                <Link
+                  to="/notifications"
+                  className="relative p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 transition-colors"
+                  title="Notifications"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-reelz-500 text-white text-[10px] font-bold flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </Link>
+
+                <Link to={`/users/${user.id}`} className="hidden sm:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                  <UserAvatar user={user} size="sm" />
+                  <span className="max-w-[120px] truncate">{getDisplayName(user)}</span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="text-sm text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
@@ -87,8 +107,10 @@ export default function Navbar() {
 
         {/* Mobile nav */}
         {user && (
-          <nav className="sm:hidden flex items-center gap-1 pb-3">
+          <nav className="sm:hidden flex items-center gap-1 pb-3 overflow-x-auto">
             <NavLink to="/" end className={navLinkClass}>Discover</NavLink>
+            <NavLink to="/feed" className={navLinkClass}>Feed</NavLink>
+            <NavLink to="/people" className={navLinkClass}>People</NavLink>
             <NavLink to="/watchlist" className={navLinkClass}>Watchlist</NavLink>
             <NavLink to="/lists" className={navLinkClass}>My Lists</NavLink>
           </nav>

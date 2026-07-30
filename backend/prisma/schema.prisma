@@ -24,16 +24,32 @@ enum WatchStatus {
   WATCHED
 }
 
+enum NotificationType {
+  FOLLOW
+  LIKE
+  COMMENT
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
   passwordHash String
   role         Role     @default(USER)
+  displayName  String?
+  avatarColor  String?
   createdAt    DateTime @default(now())
 
   watchlistEntries WatchlistEntry[]
   customLists      CustomList[]
   staffPicks       StaffPick[]
+
+  following             Follow[]       @relation("Following")
+  followers             Follow[]       @relation("Followers")
+  posts                 Post[]
+  comments              Comment[]
+  likes                 Like[]
+  notificationsReceived Notification[] @relation("NotificationRecipient")
+  notificationsSent     Notification[] @relation("NotificationActor")
 
   @@map("users")
 }
@@ -51,6 +67,7 @@ model Title {
   watchlistEntries WatchlistEntry[]
   customListItems  CustomListItem[]
   staffPicks       StaffPick[]
+  posts            Post[]
 
   @@unique([tmdbId, mediaType])
   @@map("titles")
@@ -61,13 +78,14 @@ model WatchlistEntry {
   userId         String
   titleId        String
   status         WatchStatus @default(WANT_TO_WATCH)
-  personalRating Int?        // 1-10
+  personalRating Int? // 1-10
   notes          String?
   addedAt        DateTime    @default(now())
   watchedAt      DateTime?
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title Title  @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  likes Like[]
 
   @@unique([userId, titleId])
   @@map("watchlist_entries")
@@ -105,8 +123,85 @@ model StaffPick {
   note           String?
   featuredAt     DateTime @default(now())
 
-  title    Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
-  addedBy  User  @relation(fields: [addedByAdminId], references: [id], onDelete: Cascade)
+  title   Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  addedBy User  @relation(fields: [addedByAdminId], references: [id], onDelete: Cascade)
 
   @@map("staff_picks")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  userId    String
+  body      String
+  titleId   String?
+  createdAt DateTime @default(now())
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         Title?         @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  comments      Comment[]
+  likes         Like[]
+  notifications Notification[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  body      String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+// NOTE: the DB additionally enforces CHECK num_nonnulls(postId, watchlistEntryId) = 1
+// ("likes_exactly_one_target", migration 20260730110000) — Prisma cannot model
+// CHECK constraints, so keep this comment in sync with the migration.
+model Like {
+  id               String   @id @default(cuid())
+  userId           String
+  postId           String?
+  watchlistEntryId String?
+  createdAt        DateTime @default(now())
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post           Post?           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  watchlistEntry WatchlistEntry? @relation(fields: [watchlistEntryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@unique([userId, watchlistEntryId])
+  @@map("likes")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  actorId     String
+  type        NotificationType
+  postId      String?
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor     User  @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+  post      Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }

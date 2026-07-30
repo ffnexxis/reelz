@@ -156,7 +156,8 @@ export default function StaffPicks() {
         posterPath: noteFor.posterPath,
         overview: noteFor.overview,
         releaseYear: noteFor.releaseYear,
-        genres: noteFor.genres || [],
+        // No `genres`: search results don't carry genre names
+        // (details endpoint populates them; see backend/src/lib/tmdb.js).
         note: note || undefined,
       });
       setPicks(prev => [data.pick, ...prev]);

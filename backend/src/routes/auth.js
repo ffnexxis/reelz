@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await prisma.user.create({
     data: { email, passwordHash },
-    select: { id: true, email: true, role: true, createdAt: true },
+    select: { id: true, email: true, role: true, displayName: true, avatarColor: true, createdAt: true },
   });
 
   const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role });
@@ -65,7 +65,14 @@ router.post('/login', async (req, res) => {
   const refreshToken = signRefreshToken({ sub: user.id });
 
   res.json({
-    user: { id: user.id, email: user.email, role: user.role, createdAt: user.createdAt },
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      displayName: user.displayName,
+      avatarColor: user.avatarColor,
+      createdAt: user.createdAt,
+    },
     accessToken,
     refreshToken,
   });
@@ -87,7 +94,7 @@ router.post('/refresh', async (req, res) => {
 
   const user = await prisma.user.findUnique({
     where: { id: payload.sub },
-    select: { id: true, email: true, role: true },
+    select: { id: true, email: true, role: true, displayName: true, avatarColor: true },
   });
 
   if (!user) {

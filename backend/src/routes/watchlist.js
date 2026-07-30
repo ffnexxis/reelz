@@ -53,7 +53,16 @@ router.post('/', async (req, res) => {
   // Upsert title
   const dbTitle = await prisma.title.upsert({
     where: { tmdbId_mediaType: { tmdbId, mediaType } },
-    update: { title, posterPath, overview, releaseYear, genres: genres || [] },
+    // Non-destructive: only overwrite fields the client actually supplied,
+    // so an existing Title's genre names (from GET /titles/:tmdbId) survive
+    // sparser payloads (e.g. adds from search/popular results).
+    update: {
+      title,
+      posterPath: posterPath ?? undefined,
+      overview: overview ?? undefined,
+      releaseYear: releaseYear ?? undefined,
+      ...(genres && genres.length ? { genres } : {}),
+    },
     create: { tmdbId, mediaType, title, posterPath, overview, releaseYear, genres: genres || [] },
   });
 
